@@ -1,0 +1,12 @@
+2026-01-20 15:53:46 | INFO     | generator:_load_all_modules:75 | ✓ 加载模块: student_management (学生信息管理系统) - 18 个模板
+2026-01-20 15:53:46 | INFO     | generator:__init__:60 | 生成引擎初始化完成，共 1 个模块
+2026-01-20 15:53:46 | INFO     | generator:_load_all_modules:75 | ✓ 加载模块: student_management (学生信息管理系统) - 18 个模板
+2026-01-20 15:53:46 | INFO     | generator:__init__:60 | 生成引擎初始化完成，共 1 个模块
+2026-01-20 15:53:46 | INFO     | generator:_load_all_modules:75 | ✓ 加载模块: student_management (学生信息管理系统) - 18 个模板
+2026-01-20 15:53:46 | INFO     | generator:__init__:60 | 生成引擎初始化完成，共 1 个模块
+2026-01-20 15:53:46 | INFO     | generator:lifespan:19 | ==================================================
+2026-01-20 15:53:46 | INFO     | generator:lifespan:20 | 中国学生作业代码生成器 v2.0 启动中...
+2026-01-20 15:53:46 | INFO     | generator:lifespan:22 | 目录初始化完成
+2026-01-20 15:53:46 | INFO     | generator:lifespan:23 | ==================================================
+2026-01-20 15:54:40 | INFO     | generator:generate:111 | 开始生成: module=student_management, project_id=0eef08eb
+2026-01-20 15:54:40 | INFO     | generator:generate:167 | 生成完成: 18 个文件, 耗时 0.06s

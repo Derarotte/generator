@@ -1,0 +1,65 @@
+# {{ project_name_cn }} 课程设计报告
+
+## 一、设计目的
+
+1. 掌握 Spring Boot 框架的使用
+2. 掌握 Vue 3 前端开发
+3. 掌握前后端分离的开发模式
+4. 掌握 MySQL 数据库设计
+
+## 二、开发环境
+
+- JDK 11
+- Maven 3.6+
+- Node.js 18+
+- MySQL 8.0
+- IntelliJ IDEA / VS Code
+
+## 三、系统设计
+
+### 3.1 功能模块
+
+- 学生信息的增删改查
+- 学生信息搜索
+- 数据分页展示
+
+### 3.2 数据库设计
+
+学生表 (student):
+| 字段 | 类型 | 说明 |
+|------|------|------|
+| id | bigint | 主键 |
+| student_no | varchar(20) | 学号 |
+| name | varchar(50) | 姓名 |
+| gender | varchar(10) | 性别 |
+| phone | varchar(20) | 电话 |
+| email | varchar(100) | 邮箱 |
+
+### 3.3 接口设计
+
+使用 RESTful 风格设计 API 接口。
+
+## 四、系统实现
+
+### 4.1 后端实现
+
+使用 Spring Boot + MyBatis 实现后端 API。
+
+### 4.2 前端实现
+
+使用 Vue 3 + Element Plus 实现前端界面。
+
+## 五、测试与总结
+
+### 5.1 功能测试
+
+所有功能测试通过。
+
+### 5.2 总结
+
+通过本次课程设计，掌握了前后端分离的开发模式，熟悉了 Spring Boot 和 Vue 3 的使用。
+
+---
+
+作者: {{ author }}
+日期: {{ _generated_at }}

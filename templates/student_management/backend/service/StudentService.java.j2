@@ -4,12 +4,10 @@ import {{ package_name }}.entity.Student;
 import {{ package_name }}.mapper.StudentMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 /**
- * 学生服务类
- * 
+ * 学生服务
  * @author {{ author }}
  */
 @Service
@@ -18,31 +16,18 @@ public class StudentService {
     @Autowired
     private StudentMapper studentMapper;
     
-    /**
-     * 获取所有学生
-     */
     public List<Student> findAll() {
         return studentMapper.findAll();
     }
     
-    /**
-     * 根据ID获取学生
-     */
     public Student findById(Long id) {
         return studentMapper.findById(id);
     }
     
-    /**
-     * 搜索学生
-     */
     public List<Student> search(String keyword) {
         return studentMapper.search(keyword);
     }
     
-    /**
-     * 保存学生（新增或更新）
-     */
-    @Transactional
     public int save(Student student) {
         if (student.getId() == null) {
             return studentMapper.insert(student);
@@ -50,33 +35,7 @@ public class StudentService {
         return studentMapper.update(student);
     }
     
-    /**
-     * 删除学生
-     */
-    @Transactional
     public int delete(Long id) {
         return studentMapper.delete(id);
-    }
-    
-    /**
-     * 批量删除
-     */
-    @Transactional
-    public int batchDelete(List<Long> ids) {
-        return studentMapper.batchDelete(ids);
-    }
-    
-    /**
-     * 统计总数
-     */
-    public long count() {
-        return studentMapper.count();
-    }
-    
-    /**
-     * 检查学号是否存在
-     */
-    public boolean existsByStudentNo(String studentNo) {
-        return studentMapper.findByStudentNo(studentNo) != null;
     }
 }

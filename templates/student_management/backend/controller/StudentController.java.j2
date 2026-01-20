@@ -1,0 +1,58 @@
+package {{ package_name }}.controller;
+
+import {{ package_name }}.entity.Student;
+import {{ package_name }}.service.StudentService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+import java.util.*;
+
+/**
+ * 学生控制器
+ * @author {{ author }}
+ */
+@RestController
+@RequestMapping("/api/student")
+@CrossOrigin
+public class StudentController {
+    
+    @Autowired
+    private StudentService studentService;
+    
+    @GetMapping("/list")
+    public Map<String, Object> list(@RequestParam(required = false) String keyword) {
+        Map<String, Object> r = new HashMap<>();
+        r.put("code", 200);
+        if (keyword != null && !keyword.isEmpty()) {
+            r.put("data", studentService.search(keyword));
+        } else {
+            r.put("data", studentService.findAll());
+        }
+        return r;
+    }
+    
+    @GetMapping("/{id}")
+    public Map<String, Object> getById(@PathVariable Long id) {
+        Map<String, Object> r = new HashMap<>();
+        r.put("code", 200);
+        r.put("data", studentService.findById(id));
+        return r;
+    }
+    
+    @PostMapping("/save")
+    public Map<String, Object> save(@RequestBody Student student) {
+        Map<String, Object> r = new HashMap<>();
+        studentService.save(student);
+        r.put("code", 200);
+        r.put("message", "保存成功");
+        return r;
+    }
+    
+    @DeleteMapping("/{id}")
+    public Map<String, Object> delete(@PathVariable Long id) {
+        Map<String, Object> r = new HashMap<>();
+        studentService.delete(id);
+        r.put("code", 200);
+        r.put("message", "删除成功");
+        return r;
+    }
+}

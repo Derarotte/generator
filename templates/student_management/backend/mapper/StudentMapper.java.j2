@@ -1,0 +1,32 @@
+package {{ package_name }}.mapper;
+
+import {{ package_name }}.entity.Student;
+import org.apache.ibatis.annotations.*;
+import java.util.List;
+
+/**
+ * 学生Mapper
+ * @author {{ author }}
+ */
+@Mapper
+public interface StudentMapper {
+    
+    @Select("SELECT * FROM student ORDER BY id DESC")
+    List<Student> findAll();
+    
+    @Select("SELECT * FROM student WHERE id = #{id}")
+    Student findById(Long id);
+    
+    @Select("SELECT * FROM student WHERE name LIKE CONCAT('%',#{keyword},'%') OR student_no LIKE CONCAT('%',#{keyword},'%')")
+    List<Student> search(String keyword);
+    
+    @Insert("INSERT INTO student(student_no,name,gender,birthday,phone,email,address,create_time) VALUES(#{studentNo},#{name},#{gender},#{birthday},#{phone},#{email},#{address},NOW())")
+    @Options(useGeneratedKeys = true, keyProperty = "id")
+    int insert(Student student);
+    
+    @Update("UPDATE student SET name=#{name},gender=#{gender},birthday=#{birthday},phone=#{phone},email=#{email},address=#{address},update_time=NOW() WHERE id=#{id}")
+    int update(Student student);
+    
+    @Delete("DELETE FROM student WHERE id = #{id}")
+    int delete(Long id);
+}

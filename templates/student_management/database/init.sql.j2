@@ -1,126 +1,31 @@
--- {{ project_name_cn }} 数据库初始化脚本
--- 生成时间: {{ _generated_at }}
+-- {{ project_name_cn }} 数据库初始化
 -- 作者: {{ author }}
 
--- 创建数据库
-CREATE DATABASE IF NOT EXISTS `{{ db_name }}` 
-    DEFAULT CHARACTER SET utf8mb4 
-    COLLATE utf8mb4_unicode_ci;
-
+CREATE DATABASE IF NOT EXISTS `{{ db_name }}` DEFAULT CHARSET utf8mb4;
 USE `{{ db_name }}`;
 
--- =====================================================
--- 学生表
--- =====================================================
 DROP TABLE IF EXISTS `student`;
 CREATE TABLE `student` (
-    `id` BIGINT NOT NULL AUTO_INCREMENT COMMENT '主键ID',
-    `student_no` VARCHAR(20) NOT NULL COMMENT '学号',
-    `name` VARCHAR(50) NOT NULL COMMENT '姓名',
-    `gender` VARCHAR(10) DEFAULT '男' COMMENT '性别',
-    `birthday` DATE DEFAULT NULL COMMENT '出生日期',
-    `phone` VARCHAR(20) DEFAULT NULL COMMENT '联系电话',
-    `email` VARCHAR(100) DEFAULT NULL COMMENT '邮箱',
-    `class_id` BIGINT DEFAULT NULL COMMENT '班级ID',
-    `address` VARCHAR(200) DEFAULT NULL COMMENT '家庭住址',
-    `create_time` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-    `update_time` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-    PRIMARY KEY (`id`),
-    UNIQUE KEY `uk_student_no` (`student_no`),
-    KEY `idx_class_id` (`class_id`),
-    KEY `idx_name` (`name`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='学生表';
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `student_no` varchar(20) NOT NULL COMMENT '学号',
+  `name` varchar(50) NOT NULL COMMENT '姓名',
+  `gender` varchar(10) DEFAULT '男' COMMENT '性别',
+  `birthday` date DEFAULT NULL COMMENT '出生日期',
+  `phone` varchar(20) DEFAULT NULL COMMENT '电话',
+  `email` varchar(100) DEFAULT NULL COMMENT '邮箱',
+  `address` varchar(200) DEFAULT NULL COMMENT '地址',
+  `create_time` datetime DEFAULT CURRENT_TIMESTAMP,
+  `update_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_student_no` (`student_no`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='学生表';
 
-{% if 'class' in features %}
--- =====================================================
--- 班级表
--- =====================================================
-DROP TABLE IF EXISTS `class`;
-CREATE TABLE `class` (
-    `id` BIGINT NOT NULL AUTO_INCREMENT COMMENT '主键ID',
-    `class_name` VARCHAR(50) NOT NULL COMMENT '班级名称',
-    `grade` VARCHAR(20) DEFAULT NULL COMMENT '年级',
-    `major` VARCHAR(50) DEFAULT NULL COMMENT '专业',
-    `teacher_id` BIGINT DEFAULT NULL COMMENT '班主任ID',
-    `create_time` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-    PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='班级表';
-{% endif %}
-
-{% if 'course' in features %}
--- =====================================================
--- 课程表
--- =====================================================
-DROP TABLE IF EXISTS `course`;
-CREATE TABLE `course` (
-    `id` BIGINT NOT NULL AUTO_INCREMENT COMMENT '主键ID',
-    `course_code` VARCHAR(20) NOT NULL COMMENT '课程编号',
-    `course_name` VARCHAR(100) NOT NULL COMMENT '课程名称',
-    `credit` DECIMAL(3,1) DEFAULT 0 COMMENT '学分',
-    `teacher_id` BIGINT DEFAULT NULL COMMENT '授课教师ID',
-    `create_time` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-    PRIMARY KEY (`id`),
-    UNIQUE KEY `uk_course_code` (`course_code`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='课程表';
-{% endif %}
-
-{% if 'grade' in features %}
--- =====================================================
--- 成绩表
--- =====================================================
-DROP TABLE IF EXISTS `grade`;
-CREATE TABLE `grade` (
-    `id` BIGINT NOT NULL AUTO_INCREMENT COMMENT '主键ID',
-    `student_id` BIGINT NOT NULL COMMENT '学生ID',
-    `course_id` BIGINT NOT NULL COMMENT '课程ID',
-    `score` DECIMAL(5,2) DEFAULT NULL COMMENT '成绩',
-    `semester` VARCHAR(20) DEFAULT NULL COMMENT '学期',
-    `create_time` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-    PRIMARY KEY (`id`),
-    UNIQUE KEY `uk_student_course` (`student_id`, `course_id`, `semester`),
-    KEY `idx_student_id` (`student_id`),
-    KEY `idx_course_id` (`course_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='成绩表';
-{% endif %}
-
-{% if 'teacher' in features %}
--- =====================================================
--- 教师表
--- =====================================================
-DROP TABLE IF EXISTS `teacher`;
-CREATE TABLE `teacher` (
-    `id` BIGINT NOT NULL AUTO_INCREMENT COMMENT '主键ID',
-    `teacher_no` VARCHAR(20) NOT NULL COMMENT '教师编号',
-    `name` VARCHAR(50) NOT NULL COMMENT '姓名',
-    `gender` VARCHAR(10) DEFAULT '男' COMMENT '性别',
-    `phone` VARCHAR(20) DEFAULT NULL COMMENT '联系电话',
-    `email` VARCHAR(100) DEFAULT NULL COMMENT '邮箱',
-    `department` VARCHAR(50) DEFAULT NULL COMMENT '院系',
-    `title` VARCHAR(50) DEFAULT NULL COMMENT '职称',
-    `create_time` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-    PRIMARY KEY (`id`),
-    UNIQUE KEY `uk_teacher_no` (`teacher_no`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='教师表';
-{% endif %}
-
--- =====================================================
--- 插入测试数据
--- =====================================================
+-- 测试数据
 INSERT INTO `student` (`student_no`, `name`, `gender`, `phone`, `email`) VALUES
-('2024001', '张三', '男', '13800138001', 'zhangsan@example.com'),
-('2024002', '李四', '男', '13800138002', 'lisi@example.com'),
-('2024003', '王五', '女', '13800138003', 'wangwu@example.com'),
-('2024004', '赵六', '女', '13800138004', 'zhaoliu@example.com'),
-('2024005', '陈七', '男', '13800138005', 'chenqi@example.com');
+('2024001', '张三', '男', '13800001111', 'zhangsan@example.com'),
+('2024002', '李四', '男', '13800002222', 'lisi@example.com'),
+('2024003', '王五', '女', '13800003333', 'wangwu@example.com'),
+('2024004', '赵六', '女', '13800004444', 'zhaoliu@example.com'),
+('2024005', '陈七', '男', '13800005555', 'chenqi@example.com');
 
-{% if 'course' in features %}
-INSERT INTO `course` (`course_code`, `course_name`, `credit`) VALUES
-('CS101', '计算机基础', 3.0),
-('CS102', 'Java程序设计', 4.0),
-('CS103', '数据结构', 4.0),
-('CS104', '数据库原理', 3.5),
-('CS105', '操作系统', 3.5);
-{% endif %}
-
--- 初始化完成
 SELECT '数据库初始化完成!' AS message;

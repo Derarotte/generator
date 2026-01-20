@@ -1,0 +1,22 @@
+package {{ package_name }}.entity;
+
+import lombok.Data;
+import java.util.Date;
+
+/**
+ * 学生实体
+ * @author {{ author }}
+ */
+@Data
+public class Student {
+    private Long id;
+    private String studentNo;
+    private String name;
+    private String gender;
+    private Date birthday;
+    private String phone;
+    private String email;
+    private String address;
+    private Date createTime;
+    private Date updateTime;
+}

@@ -1,15 +1,16 @@
 """
-生成引擎 v2.0 - 模板驱动架构
+生成引擎 v2.0 - 使用文件映射方式
 """
 from pathlib import Path
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, List
 import shutil
 import time
 import uuid
+import re
 
-from app.core.template_loader import TemplateLoader
-from app.core.renderer import TemplateRenderer
-from app.utils.logger import logger, log_generation_start, log_generation_success, log_generation_error
+from jinja2 import Environment, FileSystemLoader
+from app.core.template_loader import TemplateLoader, ModuleDefinition
+from app.utils.logger import logger
 from app.config import get_settings
 
 
@@ -22,7 +23,6 @@ class GenerationResult:
         message: str = "",
         files_count: int = 0,
         output_path: Optional[Path] = None,
-        zip_path: Optional[Path] = None,
         duration: float = 0.0,
         error: Optional[str] = None
     ):
@@ -31,7 +31,6 @@ class GenerationResult:
         self.message = message
         self.files_count = files_count
         self.output_path = output_path
-        self.zip_path = zip_path
         self.duration = duration
         self.error = error
     
@@ -41,7 +40,6 @@ class GenerationResult:
             "project_id": self.project_id,
             "message": self.message,
             "files_count": self.files_count,
-            "output_path": str(self.output_path) if self.output_path else None,
             "download_url": f"/api/generator/download/{self.project_id}" if self.success else None,
             "duration": round(self.duration, 2),
             "error": self.error
@@ -49,28 +47,56 @@ class GenerationResult:
 
 
 class GeneratorEngine:
-    """
-    生成引擎 v2.0
-    
-    核心能力:
-    1. 从YAML配置加载模块定义
-    2. 使用Jinja2渲染模板
-    3. 自动打包为ZIP
-    4. 完整的日志追踪
-    """
+    """生成引擎"""
     
     def __init__(self):
         self.settings = get_settings()
-        
-        # 确保目录存在
         self.settings.TEMPLATES_DIR.mkdir(parents=True, exist_ok=True)
         self.settings.OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
         
-        # 初始化组件
         self.template_loader = TemplateLoader(self.settings.TEMPLATES_DIR)
-        self.renderer = TemplateRenderer(self.settings.TEMPLATES_DIR)
+        self._jinja_envs: Dict[str, Environment] = {}
         
-        logger.info(f"生成引擎初始化完成，加载了 {len(self.template_loader.get_all_modules())} 个模块")
+        logger.info(f"生成引擎初始化完成，共 {len(self.template_loader.get_all_modules())} 个模块")
+    
+    def _get_jinja_env(self, module_path: Path) -> Environment:
+        """获取Jinja2环境"""
+        key = str(module_path)
+        if key not in self._jinja_envs:
+            env = Environment(
+                loader=FileSystemLoader(str(module_path)),
+                trim_blocks=True,
+                lstrip_blocks=True,
+                keep_trailing_newline=True
+            )
+            # 自定义过滤器
+            env.filters["lower"] = str.lower
+            env.filters["upper"] = str.upper
+            self._jinja_envs[key] = env
+        return self._jinja_envs[key]
+    
+    def _render_path(self, path_template: str, context: Dict[str, Any]) -> str:
+        """渲染路径中的变量"""
+        # 处理 {{ variable }} 形式
+        def replace(match):
+            expr = match.group(1).strip()
+            # 简单变量
+            if expr in context:
+                return str(context[expr])
+            # 带过滤器 如 package_name | replace(".", "/")
+            if "|" in expr:
+                var, *filters = [p.strip() for p in expr.split("|")]
+                value = context.get(var, "")
+                for f in filters:
+                    if "replace" in f:
+                        # 提取 replace(".", "/")
+                        m = re.search(r'replace\(["\'](.+?)["\']\s*,\s*["\'](.+?)["\']\)', f)
+                        if m:
+                            value = value.replace(m.group(1), m.group(2))
+                return str(value)
+            return match.group(0)
+        
+        return re.sub(r'\{\{\s*(.+?)\s*\}\}', replace, path_template)
     
     async def generate(
         self,
@@ -78,24 +104,14 @@ class GeneratorEngine:
         config: Dict[str, Any],
         project_id: Optional[str] = None
     ) -> GenerationResult:
-        """
-        生成项目
-        
-        Args:
-            module_id: 模块ID
-            config: 用户配置
-            project_id: 项目ID（可选，自动生成）
-            
-        Returns:
-            GenerationResult
-        """
+        """生成项目"""
         start_time = time.time()
         project_id = project_id or str(uuid.uuid4())[:8]
         
-        log_generation_start(module_id, config, project_id)
+        logger.info(f"开始生成: module={module_id}, project_id={project_id}")
         
         try:
-            # 1. 获取模块定义
+            # 1. 获取模块
             module = self.template_loader.get_module(module_id)
             if not module:
                 return GenerationResult(
@@ -104,7 +120,7 @@ class GeneratorEngine:
                     error=f"模块不存在: {module_id}"
                 )
             
-            # 2. 验证和补全配置
+            # 2. 构建上下文
             context = self._build_context(module, config)
             
             # 3. 创建输出目录
@@ -113,36 +129,42 @@ class GeneratorEngine:
                 shutil.rmtree(output_dir)
             output_dir.mkdir(parents=True)
             
-            # 4. 渲染模板
+            # 4. 获取Jinja环境
+            env = self._get_jinja_env(module.module_path)
+            
+            # 5. 渲染所有文件
             generated_files = []
             
-            # 遍历模块目录下的所有模板子目录
-            for template_subdir in ["backend", "frontend", "database", "docs"]:
-                source_dir = module.module_path / template_subdir
-                if source_dir.exists():
-                    files = self.renderer.render_directory(
-                        source_dir=source_dir,
-                        target_dir=output_dir / template_subdir,
-                        context=context,
-                        module_path=module.module_path
-                    )
-                    generated_files.extend(files)
-            
-            # 5. 生成README
-            readme_template = module.module_path / "README.md.j2"
-            if readme_template.exists():
-                readme_content = self.renderer.render_file(
-                    readme_template, context, module.module_path
-                )
-                (output_dir / "README.md").write_text(readme_content, encoding="utf-8")
-                generated_files.append(output_dir / "README.md")
+            for file_mapping in module.files:
+                source_path = file_mapping.source
+                target_path = self._render_path(file_mapping.target, context)
+                
+                source_file = module.module_path / source_path
+                target_file = output_dir / target_path
+                
+                if not source_file.exists():
+                    logger.warning(f"模板不存在: {source_path}")
+                    continue
+                
+                # 确保目标目录存在
+                target_file.parent.mkdir(parents=True, exist_ok=True)
+                
+                # 渲染模板
+                try:
+                    template = env.get_template(source_path)
+                    content = template.render(**context)
+                    target_file.write_text(content, encoding="utf-8")
+                    generated_files.append(target_file)
+                    logger.debug(f"  ✓ {source_path} -> {target_path}")
+                except Exception as e:
+                    logger.error(f"  ✗ 渲染失败 {source_path}: {e}")
             
             # 6. 打包ZIP
             zip_path = self.settings.OUTPUT_DIR / f"{project_id}.zip"
             shutil.make_archive(str(zip_path.with_suffix("")), "zip", output_dir)
             
             duration = time.time() - start_time
-            log_generation_success(module_id, project_id, len(generated_files), duration)
+            logger.info(f"生成完成: {len(generated_files)} 个文件, 耗时 {duration:.2f}s")
             
             return GenerationResult(
                 success=True,
@@ -150,59 +172,43 @@ class GeneratorEngine:
                 message=f"成功生成 {module.name}",
                 files_count=len(generated_files),
                 output_path=output_dir,
-                zip_path=zip_path,
                 duration=duration
             )
             
         except Exception as e:
-            duration = time.time() - start_time
-            error_msg = str(e)
-            log_generation_error(module_id, project_id, error_msg)
-            
+            logger.error(f"生成失败: {e}")
             return GenerationResult(
                 success=False,
                 project_id=project_id,
-                message="生成失败",
-                duration=duration,
-                error=error_msg
+                error=str(e),
+                duration=time.time() - start_time
             )
     
-    def _build_context(self, module, config: Dict[str, Any]) -> Dict[str, Any]:
+    def _build_context(self, module: ModuleDefinition, config: Dict[str, Any]) -> Dict[str, Any]:
         """构建渲染上下文"""
         context = {}
         
-        # 1. 填充默认值
+        # 默认值
         for field in module.fields:
             if field.default is not None:
                 context[field.name] = field.default
         
-        # 2. 覆盖用户配置
+        # 用户配置
         context.update(config)
         
-        # 3. 添加计算属性
+        # 计算属性
         if "package_name" in context:
             context["package_path"] = context["package_name"].replace(".", "/")
         
-        # 4. 添加元信息
-        context["_module"] = {
-            "id": module.id,
-            "name": module.name,
-            "version": module.version
-        }
-        
+        # 元信息
         from datetime import datetime
         context["_generated_at"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        context["_module_name"] = module.name
         
         return context
     
-    def get_modules(self):
-        """获取所有可用模块"""
+    def get_modules(self) -> List[ModuleDefinition]:
         return self.template_loader.get_all_modules()
     
-    def get_module(self, module_id: str):
-        """获取指定模块"""
+    def get_module(self, module_id: str) -> Optional[ModuleDefinition]:
         return self.template_loader.get_module(module_id)
-    
-    def reload_templates(self):
-        """重新加载模板"""
-        self.template_loader.reload()

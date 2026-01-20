@@ -1,0 +1,18 @@
+<template>
+  <el-container style="height: 100vh">
+    <el-header style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: space-between">
+      <h1 style="color: #fff; margin: 0">🎓 {{ project_name_cn }}</h1>
+      <el-menu mode="horizontal" router style="background: transparent; border: none">
+        <el-menu-item index="/" style="color: #fff">首页</el-menu-item>
+        <el-menu-item index="/students" style="color: #fff">学生管理</el-menu-item>
+      </el-menu>
+    </el-header>
+    <el-main style="background: #f5f7fa">
+      <router-view />
+    </el-main>
+  </el-container>
+</template>
+
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+</style>
