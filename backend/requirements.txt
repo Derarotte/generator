@@ -1,6 +1,8 @@
 fastapi
-uvicorn
+uvicorn[standard]
 jinja2
+pyyaml
 python-docx
 aiofiles
 python-multipart
+pydantic-settings

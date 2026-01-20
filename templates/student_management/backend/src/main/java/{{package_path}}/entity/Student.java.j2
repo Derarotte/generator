@@ -1,0 +1,73 @@
+package {{ package_name }}.entity;
+
+import lombok.Data;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Email;
+import java.util.Date;
+
+/**
+ * 学生实体类
+ * 
+ * @author {{ author }}
+ */
+@Data
+public class Student {
+    
+    /**
+     * 主键ID
+     */
+    private Long id;
+    
+    /**
+     * 学号
+     */
+    @NotBlank(message = "学号不能为空")
+    private String studentNo;
+    
+    /**
+     * 姓名
+     */
+    @NotBlank(message = "姓名不能为空")
+    private String name;
+    
+    /**
+     * 性别
+     */
+    private String gender;
+    
+    /**
+     * 出生日期
+     */
+    private Date birthday;
+    
+    /**
+     * 联系电话
+     */
+    private String phone;
+    
+    /**
+     * 邮箱
+     */
+    @Email(message = "邮箱格式不正确")
+    private String email;
+    
+    /**
+     * 班级ID
+     */
+    private Long classId;
+    
+    /**
+     * 家庭住址
+     */
+    private String address;
+    
+    /**
+     * 创建时间
+     */
+    private Date createTime;
+    
+    /**
+     * 更新时间
+     */
+    private Date updateTime;
+}

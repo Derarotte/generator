@@ -1,0 +1,73 @@
+package {{ package_name }}.mapper;
+
+import {{ package_name }}.entity.Student;
+import org.apache.ibatis.annotations.*;
+import java.util.List;
+
+/**
+ * 学生Mapper接口
+ * 
+ * @author {{ author }}
+ */
+@Mapper
+public interface StudentMapper {
+    
+    /**
+     * 查询所有学生
+     */
+    @Select("SELECT * FROM student ORDER BY create_time DESC")
+    List<Student> findAll();
+    
+    /**
+     * 根据ID查询学生
+     */
+    @Select("SELECT * FROM student WHERE id = #{id}")
+    Student findById(Long id);
+    
+    /**
+     * 根据学号查询学生
+     */
+    @Select("SELECT * FROM student WHERE student_no = #{studentNo}")
+    Student findByStudentNo(String studentNo);
+    
+    /**
+     * 搜索学生（按姓名或学号）
+     */
+    @Select("SELECT * FROM student WHERE name LIKE CONCAT('%', #{keyword}, '%') OR student_no LIKE CONCAT('%', #{keyword}, '%') ORDER BY create_time DESC")
+    List<Student> search(String keyword);
+    
+    /**
+     * 新增学生
+     */
+    @Insert("INSERT INTO student(student_no, name, gender, birthday, phone, email, class_id, address, create_time) " +
+            "VALUES(#{studentNo}, #{name}, #{gender}, #{birthday}, #{phone}, #{email}, #{classId}, #{address}, NOW())")
+    @Options(useGeneratedKeys = true, keyProperty = "id")
+    int insert(Student student);
+    
+    /**
+     * 更新学生
+     */
+    @Update("UPDATE student SET name=#{name}, gender=#{gender}, birthday=#{birthday}, " +
+            "phone=#{phone}, email=#{email}, class_id=#{classId}, address=#{address}, update_time=NOW() " +
+            "WHERE id=#{id}")
+    int update(Student student);
+    
+    /**
+     * 删除学生
+     */
+    @Delete("DELETE FROM student WHERE id = #{id}")
+    int delete(Long id);
+    
+    /**
+     * 批量删除
+     */
+    @Delete("<script>DELETE FROM student WHERE id IN " +
+            "<foreach collection='ids' item='id' open='(' separator=',' close=')'>#{id}</foreach></script>")
+    int batchDelete(@Param("ids") List<Long> ids);
+    
+    /**
+     * 统计总数
+     */
+    @Select("SELECT COUNT(*) FROM student")
+    long count();
+}

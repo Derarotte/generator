@@ -1,0 +1,112 @@
+# 模块定义 - 学生信息管理系统
+# 这个YAML文件定义了模块的元信息和用户可配置的字段
+
+id: student_management
+name: 学生信息管理系统
+description: 完整的学生信息管理系统，包含学生、课程、成绩管理等功能，基于Spring Boot + Vue 3开发
+version: "2.0.0"
+author: HomeworkGenerator
+icon: 🎓
+category: 管理系统
+
+tech_stack:
+  - Java
+  - Spring Boot
+  - MyBatis
+  - Vue 3
+  - Element Plus
+  - MySQL
+
+# 用户可配置的字段
+fields:
+  - name: project_name
+    label: 项目名称（英文）
+    type: text
+    required: true
+    default: StudentManagementSystem
+    placeholder: 请输入英文项目名
+    description: 用于生成Maven项目和目录名
+    
+  - name: project_name_cn
+    label: 项目中文名
+    type: text
+    required: true
+    default: 学生信息管理系统
+    description: 用于文档和界面显示
+    
+  - name: package_name
+    label: Java包名
+    type: text
+    required: true
+    default: com.example.student
+    placeholder: 如 com.company.project
+    description: Maven groupId和Java包路径
+    
+  - name: author
+    label: 作者姓名
+    type: text
+    required: true
+    default: Student
+    
+  - name: db_name
+    label: 数据库名
+    type: text
+    required: true
+    default: student_db
+    
+  - name: db_username
+    label: 数据库用户名
+    type: text
+    required: false
+    default: root
+    
+  - name: db_password
+    label: 数据库密码
+    type: text
+    required: false
+    default: root123
+    
+  - name: server_port
+    label: 后端端口
+    type: number
+    required: false
+    default: 8080
+    
+  - name: features
+    label: 功能模块
+    type: checkbox
+    required: false
+    options:
+      - value: student
+        label: 学生管理
+      - value: course
+        label: 课程管理
+      - value: grade
+        label: 成绩管理
+      - value: class
+        label: 班级管理
+      - value: teacher
+        label: 教师管理
+    default:
+      - student
+      - course
+      - grade
+
+# 模板结构说明（可选，用于文档）
+template_structure:
+  backend:
+    - pom.xml
+    - src/main/java/{{package_path}}/Application.java
+    - src/main/java/{{package_path}}/entity/*.java
+    - src/main/java/{{package_path}}/mapper/*.java
+    - src/main/java/{{package_path}}/service/*.java
+    - src/main/java/{{package_path}}/controller/*.java
+    - src/main/resources/application.yml
+  frontend:
+    - package.json
+    - vite.config.js
+    - src/**/*.vue
+  database:
+    - init.sql
+  docs:
+    - 实验报告.md

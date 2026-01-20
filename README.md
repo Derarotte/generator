@@ -1,67 +1,133 @@
 # 中国学生作业代码生成器
 
-一个模块化的学生作业代码生成系统，支持多种作业类型一键生成完整项目。
+> **版本**: 2.0.0  
+> **架构**: 模板驱动 + 插件化设计
 
-## ✨ 功能特性
+一款专为中国高校学生设计的作业代码生成系统，支持多种作业类型一键生成完整可运行项目。
 
-- 🎯 **多种作业类型** - 管理系统、Web应用、算法实验、数据分析、游戏开发
-- ⚡ **一键生成** - 选择模块，配置参数，即刻生成完整可运行项目
-- 📝 **配套文档** - 自动生成实验报告、README等中文文档
-- 🔧 **灵活配置** - 项目名称、功能模块、技术栈均可自定义
+## ✨ 核心特性
 
-## 🚀 快速开始
+- 🎯 **模板驱动** - 模板与代码分离，易于维护和扩展
+- 🔌 **插件化设计** - 模块可动态加载，支持热插拔
+- 📝 **中文友好** - 完整的中文界面和文档生成
+- ⚡ **一键生成** - 配置参数后即可生成完整项目
+- 📦 **开箱即用** - 生成的项目包含完整的前后端+数据库
 
-### 后端启动
+## 🏗️ 技术架构
 
-```bash
-cd backend
-pip install -r requirements.txt
-uvicorn app.main:app --reload --port 8000
 ```
-
-### 前端启动
-
-```bash
-cd frontend
-npm install
-npm run dev
+┌─────────────────────────────────────────────────────────────┐
+│                    前端 (Vue 3 + Element Plus)              │
+└─────────────────────────────────────────────────────────────┘
+                              ↓ API
+┌─────────────────────────────────────────────────────────────┐
+│                    后端 (FastAPI)                           │
+│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐         │
+│  │ 模板加载器  │  │ Jinja2渲染器│  │  生成引擎   │         │
+│  └─────────────┘  └─────────────┘  └─────────────┘         │
+└─────────────────────────────────────────────────────────────┘
+                              ↓
+┌─────────────────────────────────────────────────────────────┐
+│                    模板库 (YAML + Jinja2)                   │
+│  ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────────┐       │
+│  │学生管理  │ │图书管理  │ │电商系统  │ │ 更多...  │       │
+│  └──────────┘ └──────────┘ └──────────┘ └──────────┘       │
+└─────────────────────────────────────────────────────────────┘
 ```
-
-访问 http://localhost:3000 开始使用！
 
 ## 📁 项目结构
 
 ```
-homework-generator/
-├── backend/                 # Python FastAPI 后端
+generator/
+├── backend/                    # FastAPI 后端
 │   ├── app/
-│   │   ├── api/            # API路由
-│   │   ├── core/           # 核心生成引擎
-│   │   │   └── modules/    # 各类作业生成器
-│   │   └── main.py
+│   │   ├── main.py            # 应用入口
+│   │   ├── config.py          # 配置管理
+│   │   ├── api/               # API 路由
+│   │   ├── core/              # 核心引擎
+│   │   │   ├── engine.py      # 生成引擎
+│   │   │   ├── template_loader.py  # 模板加载
+│   │   │   └── renderer.py    # Jinja2 渲染
+│   │   └── utils/             # 工具函数
 │   └── requirements.txt
-├── frontend/                # Vue 3 前端
+├── frontend/                   # Vue 3 前端
 │   ├── src/
-│   │   ├── views/          # 页面组件
-│   │   ├── router/         # 路由
-│   │   └── styles/         # 样式
+│   │   ├── views/             # 页面组件
+│   │   ├── router/            # 路由
+│   │   └── styles/            # 样式
 │   └── package.json
-└── output/                  # 生成输出目录
+├── templates/                  # 【核心】模板库
+│   └── student_management/    # 示例模块
+│       ├── module.yaml        # 模块配置
+│       ├── backend/           # 后端模板 (.j2)
+│       ├── frontend/          # 前端模板 (.j2)
+│       └── database/          # 数据库模板
+├── cli.py                     # 命令行工具
+└── README.md
 ```
 
-## 📦 支持的作业类型
+## 🚀 快速开始
 
-| 类型 | 名称 | 技术栈 |
-|------|------|--------|
-| 🎓 | 学生信息管理系统 | Spring Boot + Vue + MySQL |
-| 📚 | 图书管理系统 | Spring Boot + Vue + MySQL |
-| 🏨 | 酒店管理系统 | Spring Boot + Vue + MySQL |
-| 🛒 | 电商购物平台 | Spring Boot + Vue + MySQL |
-| 📝 | 个人博客系统 | Flask + Vue + SQLite |
-| 📊 | 数据可视化大屏 | FastAPI + ECharts + Vue |
-| 🧮 | 算法实验项目 | C++ / Python |
-| ✈️ | 飞机大战游戏 | C++ + EasyX |
+### 环境要求
+
+- Python 3.9+
+- Node.js 18+
+
+### 安装依赖
+
+```bash
+# 后端
+cd backend
+pip install -r requirements.txt
+
+# 前端
+cd frontend
+npm install
+```
+
+### 启动服务
+
+```bash
+# 启动后端 (端口 8000)
+cd backend
+uvicorn app.main:app --reload --port 8000
+
+# 启动前端 (端口 3000)
+cd frontend
+npm run dev
+```
+
+### 访问
+
+- **Web界面**: http://localhost:3000
+- **API文档**: http://localhost:8000/docs
+- **命令行**: `python cli.py`
+
+## 📦 支持的模块
+
+| 模块 | 技术栈 | 状态 |
+|------|--------|------|
+| 🎓 学生信息管理系统 | Spring Boot + Vue + MySQL | ✅ |
+| 📚 图书管理系统 | Spring Boot + Vue + MySQL | 🚧 |
+| 🏨 酒店管理系统 | Spring Boot + Vue + MySQL | 🚧 |
+| 🛒 电商购物平台 | Spring Boot + Vue + MySQL | 🚧 |
+| 📝 个人博客系统 | Flask + Vue + SQLite | 🚧 |
+| 📊 数据可视化大屏 | FastAPI + Vue + ECharts | 🚧 |
+| 🧮 算法实验项目 | C++ / Python | 🚧 |
+
+## 🔧 如何添加新模块
+
+1. 在 `templates/` 下创建模块目录
+2. 编写 `module.yaml` 配置文件
+3. 创建 Jinja2 模板文件 (`.j2` 后缀)
+4. 重启服务，模块自动加载
+
+详见 [模块开发指南](./docs/module-development.md)
 
 ## 📄 License
 
-MIT
+MIT License
+
+## 👥 贡献者
+
+- [@Derarotte](https://github.com/Derarotte)

@@ -1,0 +1,22 @@
+package {{ package_name }};
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+/**
+ * {{ project_name_cn }} - 启动类
+ * 
+ * @author {{ author }}
+ * @since {{ _generated_at }}
+ */
+@SpringBootApplication
+public class Application {
+    
+    public static void main(String[] args) {
+        SpringApplication.run(Application.class, args);
+        System.out.println("==================================");
+        System.out.println("  {{ project_name_cn }} 启动成功!");
+        System.out.println("  访问: http://localhost:{{ server_port | default(8080) }}");
+        System.out.println("==================================");
+    }
+}
